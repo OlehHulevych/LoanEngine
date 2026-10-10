@@ -13,6 +13,7 @@ public class Loan:BaseEntity
     public DateTimeOffset? DisbursedAt { get; private set; }
     public DateTimeOffset? ApprovedAt { get; private set; }
     public DateTimeOffset? CompletedAt { get; private set; }
+    public string? RejectionReason { get; private set; }
     public decimal MonthlyEmi { get; private set; }
     
     public LoanStatus Status { get; private set; }
@@ -53,19 +54,17 @@ public class Loan:BaseEntity
         ApprovedAt = DateTimeOffset.UtcNow;
     }
 
-    // 2. Reject
     public void Reject(string reason)
     {
         if (Status != LoanStatus.Submitted)
             throw new InvalidOperationException($"Cannot reject a loan in '{Status}' status.");
+        RejectionReason = reason;
 
         Status = LoanStatus.Rejected;
     }
 
     public void Disburse()
     {
-        
-        
         if (Status != LoanStatus.Approved)
             throw new InvalidOperationException($"Cannot disburse funds for an unapproved loan (Current: '{Status}').");
 
@@ -89,6 +88,14 @@ public class Loan:BaseEntity
 
         Status = LoanStatus.Completed;
         CompletedAt = DateTimeOffset.UtcNow;
+    }
+    
+    public void MarkDefaulted()
+    {
+        if (Status != LoanStatus.Disbursed)
+            throw new InvalidOperationException("Only active disbursed loans can be defaulted.");
+
+        Status = LoanStatus.Defaulted;
     }
 
     public void AddInstallment(Installment installment)

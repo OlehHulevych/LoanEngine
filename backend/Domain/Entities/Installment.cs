@@ -7,9 +7,9 @@ public class Installment:BaseEntity
 {
     public Guid LoanId { get; private set; }
     public DateTimeOffset DueDate { get; private set; }
-    public Decimal PrincipalAmount { get; private set; }
-    public Decimal InterestAmount { get; private set; }
-    public Decimal PenaltyAmount { get; private set; }
+    public decimal PrincipalAmount { get; private set; }
+    public decimal InterestAmount { get; private set; }
+    public decimal PenaltyAmount { get; private set; }
     public int InstallmentNumber { get; private set; }
     public InstallmentStatus Status { get; private set; }
     public DateTimeOffset? PaidAt { get; private set; }
@@ -38,8 +38,11 @@ public class Installment:BaseEntity
     
     public void MarkOverdue(decimal lateFee)
     {
-        if (Status != InstallmentStatus.Pending)
-            return;
+        if (Status == InstallmentStatus.Paid)
+            throw new InvalidOperationException("Cannot mark a paid installment as overdue.");
+
+        if (Status == InstallmentStatus.Overdue)
+            return; 
 
         Status = InstallmentStatus.Overdue;
         PenaltyAmount = lateFee;

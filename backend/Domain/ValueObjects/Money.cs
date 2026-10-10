@@ -1,17 +1,18 @@
 ﻿namespace Domain.ValueObjects;
 
-public record Money(decimal Amount)
+public record Money
 {
-   private readonly decimal _amount =
-      Math.Round(
-         Amount >= 0 ? Amount : throw new ArgumentOutOfRangeException(nameof(Amount), "Value cannot be negative"), 2,
-         MidpointRounding.AwayFromZero);
+  public decimal Amount { get; }
 
-   public decimal Amount
-   {
-      get => _amount;
-      init => _amount = value < 0
-         ? throw new ArgumentOutOfRangeException(nameof(value), "Value cannout be negative")
-         : Math.Round(value, 2, MidpointRounding.AwayFromZero);
-   }
+  public Money(decimal amount)
+  {
+    if (amount < 0) throw new ArgumentOutOfRangeException(nameof(amount), "Money value cannout be negative");
+    Amount = Math.Round(amount, 2, MidpointRounding.AwayFromZero);
+  }
+
+  public static Money Zero => new(0m);
+
+  public static Money operator +(Money a, Money b) => new (a.Amount + b.Amount);
+  public static Money operator -(Money a, Money b) => new(a.Amount - b.Amount);
+  public override string ToString() => $"{Amount:F2}";
 } 

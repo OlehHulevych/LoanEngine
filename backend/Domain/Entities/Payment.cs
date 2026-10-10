@@ -55,7 +55,7 @@ public class Payment:BaseEntity
         PaymentStatus = PaymentStatus.Refunded;
     }
 
-    public void MakeAsFailed()
+    public void MarkFailed()
     {
         if (PaymentStatus != PaymentStatus.Pending)
             throw new InvalidOperationException($"Cannot fail payment with status '{PaymentStatus}'.");
